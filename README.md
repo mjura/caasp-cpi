@@ -1,5 +1,5 @@
 
-### Instruction for manuall setup CPI with OpenStack
+### Instruction for manual setup CPI with OpenStack
 
 On Master and Worker nodes:
 
