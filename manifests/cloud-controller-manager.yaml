@@ -16,8 +16,7 @@ spec:
     value: "true"
     effect: NoSchedule
   - key: node-role.kubernetes.io/master
-    operator: "Equal"
-    value: "true"
+    operator: "Exists"
     effect: NoSchedule
   serviceAccountName: cloud-controller-manager
   containers:
