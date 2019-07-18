@@ -7,6 +7,10 @@ On Master and Worker nodes:
 ```
 KUBELET_EXTRA_ARGS="--cloud-provider=external"
 ```
+2. Restart kubelet service
+```
+systemctl restart kubelet
+```
 
 On Master node:
 
@@ -18,24 +22,29 @@ On Master node:
 /etc/kubernetes/manifests/kube-controller-manager.yaml
 ```
 
-3. Copy manifests folder on Master node:
+3. Restart kubelet service
+```
+systemctl restart kubelet
+```
 
-4. Create `cloud-config` secret
+4. Copy manifests folder on Master node:
+
+5. Create `cloud-config` secret
 ```
 export CLOUD_CONFIG=/etc/kubernetes/cloud-config
 kubectl create secret -n kube-system generic cloud-config --from-literal=cloud.conf="$(cat $CLOUD_CONFIG)" --dry-run -o yaml > manifests/cloud-config-secret.yaml
 kubectl apply -f manifests/cloud-config-secret.yaml
 ```
 
-3. Create RBAC for cloud-controller-manager
+6. Create RBAC for cloud-controller-manager
 ```
 kubectl apply -f manifests/rbac/cloud-controller-manager-roles.yaml
 kubectl apply -f manifests/rbac/cloud-controller-manager-role-bindings.yaml
 ```
 
-5. Check logs of cloud-controller-manager
+7. Check logs of cloud-controller-manager
 ```
 kubectl logs -n kube-system cloud-controller-manager
 ```
 
-6. Deploy demo examples
+8. Deploy demo examples
