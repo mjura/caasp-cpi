@@ -36,13 +36,24 @@ kubectl create secret -n kube-system generic cloud-config --from-literal=cloud.c
 kubectl apply -f manifests/cloud-config-secret.yaml
 ```
 
-6. Create RBAC for cloud-controller-manager
+6. Create cloud-controller-manager ServiceAccount
+```
+kubectl apply -f manifests/cpi-service-account.yaml
+```
+
+7. Create RBAC for cloud-controller-manager
 ```
 kubectl apply -f manifests/rbac/cloud-controller-manager-roles.yaml
 kubectl apply -f manifests/rbac/cloud-controller-manager-role-bindings.yaml
+
 ```
 
-7. Check logs of cloud-controller-manager
+8. Deploy cloud-controller-manager pod
+```
+kubectl apply -f manifests/cloud-controller-manager.yaml
+```
+
+9. Check logs of cloud-controller-manager
 ```
 kubectl logs -n kube-system cloud-controller-manager
 ```
