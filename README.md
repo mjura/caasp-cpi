@@ -1,6 +1,43 @@
 
 ### Instruction for manual setup CPI with OpenStack
 
+#### In-tree cloud provider integration
+
+On Master and Worker nodes:
+
+1. Generate `/etc/kubernetes/cloud-config` file
+
+2. Add to `/etc/sysconfig/kubelet`
+```
+KUBELET_EXTRA_ARGS="--cloud-provider=openstack --cloud-config=/etc/kubernetes/cloud-config"
+```
+
+On Master nodes:
+1. Add `/etc/kubernetes/manifests/kube-apiserver.yaml` and `/etc/kubernetes/manifests/kube-controller-manager.yaml`
+```
+    - --cloud-provider=openstack
+    - --cloud-config=/etc/kubernetes/cloud-config
+```
+```
+    - mountPath: /etc/kubernetes/cloud-config
+      name: cloud-config
+      readOnly: true
+```
+```
+  - hostPath:
+      path: /etc/kubernetes/cloud-config
+      type: FileOrCreate
+    name: cloud-config
+```
+
+On Master and Worker nodes:
+1. Restart kubelet service
+```
+systemctl restart kubelet
+```
+
+#### Out-tree cloud provider integration
+
 On Master and Worker nodes:
 
 1. Add to `/etc/sysconfig/kubelet`
