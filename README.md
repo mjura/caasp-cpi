@@ -95,4 +95,60 @@ kubectl apply -f manifests/cloud-controller-manager.yaml
 kubectl logs -n kube-system cloud-controller-manager
 ```
 
-8. Deploy demo examples
+10. Deploy demo examples
+
+#### Cinder CSI
+
+To setup `cinder` with the `out-tree` provider it is easiest to use the `manifests` files that are provided as part of the upstream repository of the [`cloud-provider-openstack`](https://github.com/kubernetes/cloud-provider-openstack).
+
+1. Clone the repository or download a zip-file, extract it and cd into the root-folder of the project.
+
+2. Adjust the manifest files for the `cinder-csi-plugin` for the `nodecontroller` and the `nodeplugin`:
+
+    * `manifests/cinder-csi-plugin/cinder-csi-controllerplugin.yaml`
+    
+    * `manifests/cinder-csi-plugin/cinder-csi-nodeplugin.yaml`
+    
+    Add the `/etc/ssl/certs/SUSE_Trust_Root.pem` certificate to the `cinder-csi-plugin` plugin container in both files:
+    
+    ```yaml
+        - name: cinder-csi-plugin
+          # -- OMITTED --
+          volumeMounts:
+            # -- OMITTED --
+            - name: suse-ca
+              mountPath: /etc/ssl/certs/SUSE_Trust_Root.pem
+              readOnly: true
+      volumes:
+        # -- OMITTED --
+        - name: kubelet-dir
+          hostPath:
+            path: /var/lib/kubelet
+            type: Directory
+    ```
+    
+3. Remove the `secret` configuration file from the `manifests` (the `secret` has already been created):
+
+```sh
+rm manifests/cinder-csi-plugin/csi-secret-cinderplugin.yam
+```
+
+4. Apply the `manifests/cinder-csi-plugin/` folder:
+
+```sh
+kubectl -f manifests/cinder-csi-plugin apply
+```
+
+5. Deploy the example `nginx` application that is using a `PersistentVolumeClaim`:
+
+```sh
+kubectl -f examples/cinder-csi-plugin/nginx.yaml create
+```
+
+6. Verify the `PVC` is bound:
+
+```sh
+kubectl get pvc
+NAME                   STATUS   VOLUME                                     CAPACITY   ACCESS MODES   STORAGECLASS          AGE
+csi-pvc-cinderplugin   Bound    pvc-39e361a7-4bbe-4252-ba73-fb7ab01cea02   1Gi        RWO            csi-sc-cinderplugin   4s
+```
